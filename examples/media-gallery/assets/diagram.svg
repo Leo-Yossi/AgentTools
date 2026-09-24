@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="240" viewBox="0 0 520 240">
+  <rect width="520" height="240" fill="#fafafa"/>
+  <text x="260" y="34" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#6a005f">Markdown → Slide 流程</text>
+  <rect x="30" y="80" width="120" height="56" rx="8" fill="#e9d8f5"/>
+  <text x="90" y="114" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#222">.md 源文件</text>
+  <rect x="200" y="80" width="120" height="56" rx="8" fill="#d8e8f5"/>
+  <text x="260" y="114" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#222">生成器</text>
+  <rect x="370" y="80" width="120" height="56" rx="8" fill="#d8f5dd"/>
+  <text x="430" y="114" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#222">HTML 幻灯片</text>
+  <line x1="150" y1="108" x2="198" y2="108" stroke="#888" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="320" y1="108" x2="368" y2="108" stroke="#888" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="30" y="170" width="460" height="44" rx="8" fill="#fff3d6"/>
+  <text x="260" y="197" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#222">Demo：独立网页（demos/）通过 iframe / code-card 嵌入</text>
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#888"/>
+    </marker>
+  </defs>
+</svg>

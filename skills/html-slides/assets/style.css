@@ -1,0 +1,189 @@
+/* JYY 2026 幻灯片风格复刻 —— 基础排版（真实系统用 Tailwind + 自定义 slideshow 组件，这里给纯 Markdown 内容补一套可用的幻灯片排版） */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #fafafa;
+  font-family: 'Lato', 'PingFang SC', 'Microsoft YaHei', 'STHeiti', system-ui, sans-serif;
+  color: #222;
+}
+
+#app { min-height: 100%; }
+
+/* 正文（长文笔记 / GSE 风格） */
+.preamble {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  background: #fff;
+  min-height: 100vh;
+  line-height: 1.8;
+}
+.preamble h1 { font-size: 2rem; border-bottom: 2px solid rgb(106,0,95); padding-bottom: .3em; }
+.preamble h2 { font-size: 1.5rem; margin-top: 1.4em; }
+.preamble p, .preamble li { font-size: 1.05rem; }
+
+/* ---------- 幻灯片 ---------- */
+.deck {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.slides { width: 100%; height: 100%; }
+
+.slide {
+  display: none;
+  position: absolute;
+  inset: 0;
+  padding: 6vh 8vw;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: #fafafa;
+}
+.slide.active { display: flex; }
+.slide { overflow: auto; padding-bottom: 76px; }
+.slide > * { flex-shrink: 0; }
+.slide p { margin: .35em 0; }
+.slide ul, .slide ol { margin: .35em 0; }
+.slide table { border-collapse: collapse; width: 100%; font-size: 1.2rem; }
+.slide th, .slide td { padding: .45em .7em; border-bottom: 1px solid #ddd; text-align: left; }
+.slide th { background: #f3e8f3; }
+.slide iframe { flex-shrink: 0; max-width: 100%; }
+.media { margin: .5em 0; width: 100%; min-width: 0; }
+.media video { display: block; width: 100%; max-height: 54vh; background: #111; object-fit: contain; }
+.media audio { display: block; width: min(100%, 800px); }
+.media iframe { display: block; width: 100%; max-height: 54vh; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+.media iframe:not([src]) { display: none; }
+.media > img { display: block; max-height: 52vh; max-width: 100%; }
+.media:has(iframe[src]) > .media-poster { display: none; }
+.media figcaption, .slide .media-fallback, .slide .media-status { font-size: 1rem; line-height: 1.5; margin: .4em 0; color: #555; }
+.media-status:empty { display: none; }
+.media button { padding: .5em 1em; cursor: pointer; }
+[data-zoom] { cursor: zoom-in; }
+.media-lightbox { max-width: 95vw; max-height: 95vh; padding: 16px; border: 0; border-radius: 8px; }
+.media-lightbox::backdrop { background: #000b; }
+.media-lightbox img { display: block; max-width: 90vw; max-height: 82vh; object-fit: contain; }
+.media-lightbox button { float: right; margin-bottom: 12px; padding: 8px 18px; }
+@media (prefers-reduced-motion: reduce) { .fragment { transition: none !important; } }
+.slide .katex { font-size: 1.15em; }
+.slide .katex-display { overflow-x: auto; overflow-y: hidden; padding: .3em 0; }
+.speaker-notes { display: none; }
+.show-notes .slide.active .speaker-notes { display: block; background: #fff8db; padding: 16px; margin-top: 20px; font-size: 1rem; }
+.controls { position: fixed; bottom: 12px; right: 18px; display: flex; gap: 10px; align-items: center; z-index: 100; background: #fffffff0; padding: 4px 8px; border-radius: 8px; }
+.controls button { border: 1px solid #ddd; border-radius: 5px; background: white; padding: 5px 10px; cursor: pointer; }
+.controls #slide-counter { position: static; padding: 0; background: none; }
+@media (max-width: 700px) {
+  .slide { padding: 5vh 6vw 76px; }
+  .slide h1 { font-size: 2rem; }
+  .slide h2 { font-size: 1.6rem; }
+  .slide p, .slide li { font-size: 1.1rem; }
+}
+@media print {
+  html, body, .deck, .slides { height: auto !important; overflow: visible !important; }
+  .slide { display: block !important; position: relative !important; min-height: 100vh; height: auto; overflow: visible; break-after: page; padding: 32px; }
+  .fragment { opacity: 1 !important; }
+  .controls, .speaker-notes, .preamble { display: none !important; }
+}
+
+.slide h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 .4em;
+  color: #1a1a1a;
+}
+.slide h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: .2em 0 .5em;
+  border-bottom: 2px solid rgb(106,0,95);
+  padding-bottom: .2em;
+  color: #222;
+}
+.slide h3 { font-size: 1.5rem; margin: .6em 0 .3em; }
+.slide p, .slide li { font-size: 1.4rem; line-height: 1.7; }
+.slide ul, .slide ol { padding-left: 1.4em; }
+.slide li { margin: .35em 0; }
+.slide strong { color: rgb(106,0,95); }
+
+.slide pre {
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-size: 1.1rem;
+  overflow: auto;
+  max-height: 60vh;
+}
+.slide code {
+  font-family: 'Inconsolata', 'Fira Code', ui-monospace, monospace;
+  font-size: 1.05rem;
+}
+.slide :not(pre) > code {
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.slide blockquote {
+  background: #f3e8f3;
+  border-left: 4px solid rgb(106,0,95);
+  margin: 0 0 1em;
+  padding: 12px 18px;
+  border-radius: 6px;
+  color: #4a1a47;
+}
+.slide img { max-width: 100%; max-height: 60vh; border-radius: 8px; }
+
+.slide a { color: rgb(106,0,95); }
+
+/* JYY 风格的红色强调标签 <red>...</red> */
+red { color: #c81e1e; font-weight: 600; }
+
+/* 分步显示：fragment */
+.fragment { opacity: 0; transition: opacity .25s ease; }
+.fragment.visible { opacity: 1; }
+
+/* note 组件 */
+.note {
+  border: 1px solid #e2c8e0;
+  background: #fdf6fb;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 1em 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.note h1 { font-size: 1.3rem; margin: 0 0 .3em; color: rgb(106,0,95); }
+
+/* code-card 组件（链接到 demo 的卡片） */
+.code-card {
+  display: block;
+  text-decoration: none;
+  border: 1px solid #d8c8f0;
+  background: linear-gradient(135deg, #f6f1ff, #fff);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 1em 0;
+  transition: transform .15s ease, box-shadow .15s ease;
+  color: inherit;
+}
+.code-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(106,0,95,.18); }
+.code-card-body h1 { font-size: 1.5rem; margin: 0 0 .2em; color: rgb(106,0,95); }
+.code-card-body p { font-size: 1.1rem; margin: .2em 0; }
+
+/* 幻灯片页码 */
+#slide-counter {
+  position: fixed;
+  right: 18px;
+  bottom: 14px;
+  z-index: 99;
+  font-size: 1.1rem;
+  color: #888;
+  background: rgba(255,255,255,.7);
+  padding: 2px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+}
