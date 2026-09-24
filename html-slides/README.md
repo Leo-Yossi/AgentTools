@@ -31,9 +31,9 @@ node skills/html-slides/scripts/slides.mjs build examples/media-gallery
 node skills/html-slides/scripts/slides.mjs serve examples/media-gallery --port 8080
 ```
 
-浏览器打开 <http://127.0.0.1:8080/> 查看示例。音视频、字幕和 PDF 推荐通过这个本地服务器预览。
+浏览器打开 <http://127.0.0.1:8080/> 查看示例。音视频、字幕和 PDF 推荐通过这个本地服务器预览。保持终端运行，保存 Markdown 或素材后，浏览器和 dist 中的 HTML 会自动更新；用 Ctrl+C 停止。直接打开或复制出去的静态 HTML 不会监听修改。
 
-编辑时使用上面的 `serve` 命令；保存 Markdown 或素材后，浏览器自动刷新。构建失败会保留上一次成功的页面并显示错误。只想预览已构建的 dist 时可加 `--no-watch`。默认快捷键是空格/右方向键下一页、左方向键上一页；每套课件在问答阶段确认是否需要自定义，设置写在 `slides.config.json`。
+构建失败会保留上一次成功的页面并显示错误。只想预览已构建的 dist 时可加 `--no-watch`。默认快捷键是空格/右方向键下一页、左方向键上一页；每套课件在问答阶段确认是否需要自定义，设置写在 `slides.config.json`。
 
 创建自己的演示项目：
 
