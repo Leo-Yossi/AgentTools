@@ -4,11 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { compile, escape, checkReferences } from './compiler.mjs';
 import { createPreviewServer } from './server.mjs';
+import { loadConfig } from './config.mjs';
+import { watchProject } from './watch.mjs';
 
 const require = createRequire(import.meta.url);
 const SKILL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [command, projectArg, ...args] = process.argv.slice(2);
-const help = `用法：node <skill>/scripts/slides.mjs init|build|serve <项目目录> [--port 8080]\n项目文件：slides/*.md、assets/、demos/、可选 theme.css；输出：dist/`;
+const help = `用法：node <skill>/scripts/slides.mjs init|build|serve <项目目录> [--port 8080] [--watch]\nserve --watch：保存 Markdown/素材后自动构建并刷新网页；输出：dist/`;
 function files(dir) {
   return fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => {
     const p = path.join(dir, e.name);
@@ -25,10 +27,7 @@ function copy(from, to) {
   }
 }
 function build(project) {
-  const configFile=path.join(project,'slides.config.json');
-  const config=fs.existsSync(configFile)?JSON.parse(fs.readFileSync(configFile,'utf8')):{};
-  if (!config || Array.isArray(config) || typeof config!=='object' || Object.keys(config).some(k=>k!=='network') || !['offline','online'].includes(config.network || 'offline')) throw new Error('slides.config.json 仅支持 network: offline 或 online');
-  const network=config.network || 'offline';
+  const {network,keyboard}=loadConfig(project);
   const source = path.join(project, 'slides');
   if (!fs.existsSync(source)) throw new Error('缺少 slides/，请先 init 或创建项目目录');
   const inputs = fs.readdirSync(source).filter(f => f.endsWith('.md')).sort();
@@ -42,6 +41,7 @@ function build(project) {
     const vendor = path.join(stage, '_slides'); fs.mkdirSync(vendor);
     fs.copyFileSync(path.join(SKILL,'assets/style.css'), path.join(vendor,'style.css'));
     fs.copyFileSync(path.join(SKILL,'assets/runtime.js'), path.join(vendor,'runtime.js'));
+    fs.writeFileSync(path.join(vendor,'keyboard.js'),`window.__slidesKeyboard=${JSON.stringify(keyboard)};\n`);
     const katexRoot = path.dirname(require.resolve('katex/package.json'));
     fs.copyFileSync(path.join(katexRoot,'dist/katex.min.css'), path.join(vendor,'katex.min.css'));
     copy(path.join(katexRoot,'dist/fonts'), path.join(vendor,'fonts'));
@@ -53,8 +53,8 @@ function build(project) {
     for (const input of inputs) {
       const result = compile(fs.readFileSync(path.join(source,input),'utf8'),{network});
       const output = input.slice(0,-3) + '.html';
-      fs.writeFileSync(path.join(stage,output), `<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(result.title)}</title><link rel="stylesheet" href="_slides/katex.min.css"><link rel="stylesheet" href="_slides/highlight.css"><link rel="stylesheet" href="_slides/style.css">${fs.existsSync(path.join(vendor,'theme.css')) ? '<link rel="stylesheet" href="_slides/theme.css">' : ''}</head><body><main id="app">${result.body}</main><nav class="controls" aria-label="幻灯片控制"><button data-action="prev" aria-label="上一页">←</button><span id="slide-counter" aria-live="polite"></span><button data-action="next" aria-label="下一页">→</button><button data-action="notes">讲稿</button><button data-action="fullscreen">全屏</button></nav><script src="_slides/runtime.js"></script></body></html>`);
-      manifest.push({source:input, file:output, title:result.title, slides:result.count, titles:result.titles,network,media:result.media});
+      fs.writeFileSync(path.join(stage,output), `<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(result.title)}</title><link rel="stylesheet" href="_slides/katex.min.css"><link rel="stylesheet" href="_slides/highlight.css"><link rel="stylesheet" href="_slides/style.css">${fs.existsSync(path.join(vendor,'theme.css')) ? '<link rel="stylesheet" href="_slides/theme.css">' : ''}</head><body><main id="app">${result.body}</main><nav class="controls" aria-label="幻灯片控制"><button data-action="prev" aria-label="上一页">←</button><span id="slide-counter" aria-live="polite"></span><button data-action="next" aria-label="下一页">→</button><button data-action="notes">讲稿</button><button data-action="fullscreen">全屏</button></nav><script src="_slides/keyboard.js"></script><script src="_slides/runtime.js"></script></body></html>`);
+      manifest.push({source:input, file:output, title:result.title, slides:result.count, titles:result.titles,network,keyboard,media:result.media});
     }
     if (!inputs.includes('index.md')) fs.writeFileSync(path.join(stage,'index.html'),`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>课件目录</title><link rel="stylesheet" href="_slides/style.css"><main class="preamble"><h1>课件目录</h1><ul>${manifest.map(m=>`<li><a href="${escape(encodeURIComponent(m.file))}">${escape(m.title)}</a>（${m.slides} 页）</li>`).join('')}</ul></main></html>`);
     const remote=new Set();
@@ -74,14 +74,27 @@ function build(project) {
   } finally { if (fs.existsSync(stage)) fs.rmSync(stage,{recursive:true}); }
 }
 function serve(project) {
-  if (args.length && (args.length !== 2 || args[0] !== '--port')) throw new Error(help);
-  const port = args.length ? Number(args[1]) : 8080;
+  let port=8080,watch=false;
+  for(let i=0;i<args.length;i++){
+    if(args[i]==='--watch')watch=true;
+    else if(args[i]==='--port' && args[i+1])port=Number(args[++i]);
+    else throw new Error(help);
+  }
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('端口应为 1–65535');
   const root = path.join(project,'dist');
+  let status;
+  if(watch){
+    status={version:0,error:null};
+    try{build(project);status.version++;}catch(error){status.error=error.message;console.error(error.message);}
+  }
   if (!fs.existsSync(root)) throw new Error('请先 build');
-  const server = createPreviewServer(root);
+  const server = createPreviewServer(root,watch?{status:()=>status}:{});
+  if(watch)watchProject(project,()=>{
+    try{build(project);status.version++;status.error=null;console.log('已更新网页');}
+    catch(error){status.error=error.message;console.error(`编译失败：${error.message}`);}
+  });
   server.on('error',e=>{ console.error(e.message); process.exitCode=1; });
-  server.listen(port,'127.0.0.1',()=>console.log(`预览：http://127.0.0.1:${port}/ （Ctrl+C 停止）`));
+  server.listen(port,'127.0.0.1',()=>console.log(`预览：http://127.0.0.1:${port}/ ${watch?'（保存后自动更新；Ctrl+C 停止）':'（Ctrl+C 停止）'}`));
 }
 try {
   if (!projectArg || !['init','build','serve'].includes(command)) throw new Error(help);
@@ -92,7 +105,7 @@ try {
     if (fs.existsSync(project) && fs.readdirSync(project).length) throw new Error('init 需要不存在或空的项目目录，避免覆盖已有内容');
     for (const dir of ['slides','assets','demos']) fs.mkdirSync(path.join(project,dir),{recursive:true});
     fs.copyFileSync(path.join(SKILL,'assets/starter.md'),path.join(project,'slides/deck.md'));
-    fs.writeFileSync(path.join(project,'brief.md'),'# 演示需求\n\n- 受众：待讨论\n- 目标：待讨论\n- 时长与页数：待讨论\n- 视觉风格：简洁教学风格\n- 待确认的问题：\n');
+    fs.writeFileSync(path.join(project,'brief.md'),'# 演示需求\n\n- 受众：待讨论\n- 目标：待讨论\n- 时长与页数：待讨论\n- 视觉风格：简洁教学风格\n- 快捷键：待确认（建议空格/右方向键下一页、左方向键上一页）\n- 待确认的问题：\n');
     console.log(`已创建项目：${project}`);
   } else if (command === 'build') build(project);
   else serve(project);

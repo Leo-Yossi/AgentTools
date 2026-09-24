@@ -9,6 +9,7 @@ my-talk/
   assets/            图片等本地素材
   demos/name/index.html  可选交互页面
   theme.css          可选项目样式覆盖
+  slides.config.json 可选快捷键和联网设置
   dist/              自动生成，不直接编辑
 ```
 
@@ -51,7 +52,24 @@ HTML 是可信作者内容，不做安全沙箱。不要将来路不明的脚本
 
 默认宽屏浏览器自适应排版。当前没有 Tailwind 运行时，不假定 Tailwind 工具类有效。需要样式时在项目 `theme.css` 定义 CSS。每页只承载一个重点，建议一行结论配 2–4 个短要点，或一张主要图片/视频配少量文字。长段落、完整代码与背景资料放讲稿或拆成下一页。编译器对页面内容量设置上限并报告超限页；这是保守估算，还须在实际投影尺寸检查。幻灯片本身不显示纵向滚动条。
 
-方向键、空格、PageUp/PageDown 翻页，Home/End 首尾页，F 全屏，N 讲稿。按钮也可以操作。支持 `deck.html#slide-3` 定位页面。焦点在输入框和交互控件内时不拦截键盘。打印显示全部页面与 fragment，默认不打印讲稿；打印不等于原生 PPTX 导出。
+新课件先问用户是否要快捷键和自定义。默认**空格或右方向键下一页，左方向键上一页**；其他键默认不启用。所有快捷键可在项目根目录的 `slides.config.json` 配置：
+
+```json
+{
+  "keyboard": {
+    "next": ["Space", "ArrowRight", "ArrowDown"],
+    "prev": ["ArrowLeft", "ArrowUp"],
+    "first": ["Home"],
+    "last": ["End"],
+    "notes": ["KeyN"],
+    "fullscreen": ["KeyF"]
+  }
+}
+```
+
+这里只需要填写要改的操作；未写的操作沿用默认（除 next/prev 外都是空数组）。完全关闭快捷键用 `{"keyboard":false}`。按键名使用浏览器的 `KeyboardEvent.code`：方向键、Space、PageUp/PageDown、Home/End、Enter、KeyA–KeyZ。同一按键不可分配给多个操作。下方按钮始终可用。焦点在输入框、链接和媒体控件内时不抢按键。支持 `deck.html#slide-3` 定位页面。打印显示全部页面与 fragment，默认不打印讲稿；打印不等于原生 PPTX 导出。
+
+编辑时运行 `node <skill>/scripts/slides.mjs serve <project> --watch --port 8080`，在浏览器打开本地地址。保存 `slides/*.md`、assets、demos、`theme.css` 或配置后会重建并刷新，尽量停留在原页。编译失败时网页显示错误并保留上次可用版本。初次启动需有可成功构建的文稿；普通 `serve`、直接打开 HTML、已复制出去的 dist 不会监听源文件。
 
 ## 离线约定
 

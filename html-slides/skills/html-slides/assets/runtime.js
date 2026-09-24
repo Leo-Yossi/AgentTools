@@ -4,6 +4,7 @@
   const counts = slides.map(() => 0);
   let current = 0;
   let previous = -1;
+  const keyboard=window.__slidesKeyboard;
   const layoutWarning=document.createElement('div');layoutWarning.id='layout-warning';layoutWarning.hidden=true;layoutWarning.setAttribute('role','alert');document.body.append(layoutWarning);
   const mediaStatus=(media,text)=>{const status=media.closest('.media')?.querySelector('.media-status');if(status)status.textContent=text;};
   document.querySelectorAll('video,audio').forEach(media=>{
@@ -100,12 +101,16 @@
   document.addEventListener('keydown', e => {
     if(e.target.matches('[data-zoom]') && ['Enter',' '].includes(e.key)){e.preventDefault();e.target.click();return;}
     if (e.altKey || e.ctrlKey || e.metaKey || e.target.closest('dialog,input,textarea,select,button,a,video,audio,[contenteditable="true"]')) return;
-    if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); next(); }
-    if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
-    if (e.key === 'Home') { e.preventDefault(); current = 0; counts.fill(0); render(); }
-    if (e.key === 'End') { e.preventDefault(); current = slides.length-1; slides.forEach((_,i)=>counts[i]=fragments(i).length); render(); }
-    if (e.key.toLowerCase() === 'n') action('notes');
-    if (e.key.toLowerCase() === 'f') action('fullscreen');
+    if(!keyboard)return;
+    const key=e.code || ({' ':'Space'}[e.key]||e.key);
+    const command=Object.entries(keyboard).find(([,keys])=>keys.includes(key))?.[0];
+    if(!command)return;
+    e.preventDefault();
+    if(command==='next')next();
+    else if(command==='prev')prev();
+    else if(command==='first'){current=0;counts.fill(0);render();}
+    else if(command==='last'){current=slides.length-1;slides.forEach((_,i)=>counts[i]=fragments(i).length);render();}
+    else action(command);
   });
   document.addEventListener('click', e => {
     if(e.target.closest('[data-load-frame]')) {

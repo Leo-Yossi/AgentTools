@@ -1,10 +1,10 @@
 {
   "name": "html-slides-skill",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "engines": { "node": ">=18" },
-  "scripts": { "test": "node --test scripts/compiler.test.mjs scripts/media.test.mjs" },
+  "scripts": { "test": "node --test scripts/compiler.test.mjs scripts/media.test.mjs scripts/config.test.mjs scripts/watch.test.mjs" },
   "dependencies": {
     "markdown-it": "14.1.0",
     "parse5": "7.2.1",

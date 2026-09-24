@@ -2,13 +2,19 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 const MIME={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.gif':'image/gif','.webp':'image/webp','.avif':'image/avif','.mp4':'video/mp4','.m4v':'video/mp4','.webm':'video/webm','.ogv':'video/ogg','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.ogg':'audio/ogg','.flac':'audio/flac','.vtt':'text/vtt; charset=utf-8','.pdf':'application/pdf','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf','.json':'application/json','.wasm':'application/wasm','.glb':'model/gltf-binary','.gltf':'model/gltf+json'};
-export function createPreviewServer(directory) {
+const watchScript=fs.readFileSync(new URL('../assets/watch.js',import.meta.url),'utf8');
+export function createPreviewServer(directory, options={}) {
   const root=fs.realpathSync(directory);
   const inside=file=>{const rel=path.relative(root,file); return !rel.startsWith('..')&&!path.isAbsolute(rel);};
   return http.createServer((req,res)=>{
     if(!['GET','HEAD'].includes(req.method)) {res.writeHead(405,{Allow:'GET, HEAD'});res.end();return;}
     try {
       const url=decodeURIComponent(req.url.split('?')[0]);
+      if(options.status && (url==='/__slides/status'||url==='/__slides/watch.js')){
+        const body=url.endsWith('.js')?watchScript:JSON.stringify(options.status());
+        res.writeHead(200,{'Content-Type':url.endsWith('.js')?'text/javascript; charset=utf-8':'application/json; charset=utf-8','Cache-Control':'no-store'});
+        res.end(req.method==='HEAD'?'':body);return;
+      }
       let file=path.resolve(root,'.'+url);
       if(!inside(file)) {res.writeHead(403);res.end();return;}
       if(fs.statSync(file).isDirectory()) file=path.join(file,'index.html');
@@ -17,6 +23,13 @@ export function createPreviewServer(directory) {
       const stat=fs.statSync(file);
       if(!stat.isFile()) throw new Error('not a file');
       const headers={'Content-Type':MIME[path.extname(file).toLowerCase()]||'application/octet-stream','Accept-Ranges':'bytes','Cache-Control':'no-store'};
+      if(options.status && path.extname(file).toLowerCase()==='.html'){
+        const html=fs.readFileSync(file,'utf8');
+        const script='<script src="/__slides/watch.js"></script>';
+        const body=html.includes('</body>')?html.replace('</body>',script+'</body>'):html.replace('</html>',script+'</html>');
+        res.writeHead(200,{...headers,'Content-Length':Buffer.byteLength(body)});
+        res.end(req.method==='HEAD'?'':body);return;
+      }
       let start=0,end=stat.size-1,status=200;
       // Single byte ranges cover browser seeking. Ignore multi-range requests.
       if(req.headers.range && !req.headers.range.includes(',') && req.method==='GET') {
