@@ -1,0 +1,6 @@
+# 个人私藏检索源（含你调研中收藏的好站），不随 skill 提交/分享
+platforms.user.json
+
+# Python 缓存
+__pycache__/
+*.pyc

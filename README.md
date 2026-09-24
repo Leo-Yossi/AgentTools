@@ -7,6 +7,7 @@
 | 子项目 | 用途 | 使用说明 |
 |---|---|---|
 | html-slides | 与 AI 逐页讨论内容，将 Markdown 编译为支持多媒体的 HTML 幻灯片 | [进入项目](html-slides/README.md) |
+| research-methodology | 通用科研/技术调研方法论：想法 → 关键词 → 检索式 → 多源检索 → 调研报告 | [进入项目](research-methodology/README.md) |
 
 ```text
 AgentTools/
@@ -16,6 +17,13 @@ AgentTools/
     skills/html-slides/ Skill 与编译器
     examples/          可运行示例
     tools/             打包工具
+  research-methodology/ 调研方法论项目
+    README.md
+    SKILL.md            Skill 入口与路由
+    references/         方法论正文
+    prompts/            提示词模板
+    assets/             检索脚本与平台配置
+    topics/             实跑样例
   <其他项目>/           后续独立工具项目
 ```
 

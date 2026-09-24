@@ -1,0 +1,27 @@
+{
+  "_comment": "检索平台配置（配置即数据）。新增 / 修改检索平台只需编辑本文件，无需改动 build_query.py。query 字段取值见 build_query.py 的 QUERY_FUNCS 注册表：generic / plain / pubmed / cnki / arxiv / scholar / none。url 中的 {q} 会被自动替换为编码后的检索式；无外链模板的平台设 url 为 null、query 为 none。",
+  "platforms": [
+    { "category": "papers", "name": "Google Scholar", "url": "https://scholar.google.com/scholar?q={q}", "query": "generic", "note": "覆盖最广，注意加 after: 限定年份" },
+    { "category": "papers", "name": "arXiv", "url": "https://arxiv.org/search/?searchtype=all&query={q}", "query": "arxiv", "note": "预印本，追最新；可加 &start= 翻页" },
+    { "category": "papers", "name": "Semantic Scholar", "url": "https://www.semanticscholar.org/search?q={q}", "query": "generic", "note": "AI 语义检索，支持自然语言长句" },
+    { "category": "papers", "name": "OpenAlex", "url": "https://openalex.org/works?filter=title_and_abstract.search:{q}", "query": "generic", "note": "开放 API，适合批量" },
+    { "category": "papers", "name": "PubMed", "url": "https://pubmed.ncbi.nlm.nih.gov/?term={q}", "query": "pubmed", "note": "生物医学，[Title/Abstract] 限定" },
+    { "category": "papers", "name": "DBLP", "url": "https://dblp.org/search?q={q}", "query": "generic", "note": "计算机文献目录最准" },
+    { "category": "papers", "name": "IEEE Xplore", "url": "https://ieeexplore.ieee.org/search/searchresult.jsp?queryText={q}", "query": "generic", "note": "需机构订阅" },
+    { "category": "papers", "name": "ScienceDirect", "url": "https://www.sciencedirect.com/search?qs={q}", "query": "generic", "note": "Elsevier 全学科" },
+    { "category": "papers", "name": "CNKI 中国知网", "url": null, "query": "cnki", "note": "需机构订阅；把下方检索式粘贴进高级检索框" },
+    { "category": "papers", "name": "百度学术", "url": "https://xueshu.baidu.com/s?wd={q}", "query": "generic", "note": "中文文献补充源" },
+    { "category": "papers", "name": "万方数据", "url": "https://s.wanfangdata.com.cn/paper?q={q}", "query": "generic", "note": "中文期刊/学位/会议" },
+    { "category": "papers", "name": "ChinaXiv", "url": null, "query": "none", "note": "国内预印本，用站内搜索框" },
+    { "category": "datasets", "name": "HuggingFace Datasets", "url": "https://huggingface.co/datasets?search={q}", "query": "plain", "note": "可加 &license= 过滤许可" },
+    { "category": "datasets", "name": "Kaggle Datasets", "url": "https://www.kaggle.com/search?q={q}", "query": "plain", "note": "社区数据，评论区有质量反馈" },
+    { "category": "datasets", "name": "Google Dataset Search", "url": "https://datasetsearch.research.google.com/search?query={q}", "query": "plain", "note": "找数据的第一入口" },
+    { "category": "datasets", "name": "Papers with Code", "url": "https://paperswithcode.com/search?q={q}", "query": "plain", "note": "按任务找 SOTA 数据集" },
+    { "category": "datasets", "name": "Zenodo", "url": "https://zenodo.org/search?q={q}", "query": "plain", "note": "全学科，DOI 永久" },
+    { "category": "datasets", "name": "天池数据集", "url": null, "query": "none", "note": "国内赛题数据，用站内搜索" },
+    { "category": "datasets", "name": "飞桨 AI Studio", "url": null, "query": "none", "note": "中文数据集，用站内搜索" },
+    { "category": "datasets", "name": "OpenDataLab", "url": null, "query": "none", "note": "上海AI实验室，用站内搜索" },
+    { "category": "code", "name": "GitHub", "url": "https://github.com/search?q={q}&type=repositories", "query": "generic", "note": "可加 stars:>100 过滤" },
+    { "category": "code", "name": "Gitee", "url": "https://search.gitee.com/?type=repository&q={q}", "query": "plain", "note": "国内镜像" }
+  ]
+}

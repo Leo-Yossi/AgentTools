@@ -1,0 +1,20 @@
+{
+  "_comment": "这是 platforms.user.json 的示例模板，不会被脚本自动加载。请把本文件复制为同目录的 platforms.user.json 再按需增删。个人配置会自动合并到主配置 platforms.json 之上，且永远不会被主配置更新覆盖——专门存放你在调研中自己发现并收藏的好源。",
+  "platforms": [
+    {
+      "category": "papers",
+      "name": "示例-某聚合检索站",
+      "url": "https://example.com/search?q={q}",
+      "query": "generic",
+      "note": "研究中发现的优质聚合源，把 {q} 替换为检索式"
+    },
+    {
+      "category": "papers",
+      "name": "示例-鸟类监测实测报告",
+      "url": null,
+      "link": "https://example.com/bird-monitoring-report",
+      "query": "none",
+      "note": "很有价值的实测对比，作为固定书签收藏"
+    }
+  ]
+}
