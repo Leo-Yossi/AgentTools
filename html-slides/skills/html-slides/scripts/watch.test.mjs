@@ -16,7 +16,7 @@ async function until(check) {
   }
   throw new Error('Timed out waiting for live rebuild');
 }
-test('watch rebuilds Markdown, keeps last good page on error, then recovers',async()=>{
+test('serve automatically rebuilds Markdown, keeps last good page on error, then recovers',async()=>{
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'slides-watch-'));
   const project=path.join(root,'talk');
   assert.equal(spawnSync(process.execPath,[cli,'init',project],{encoding:'utf8'}).status,0);
@@ -24,7 +24,7 @@ test('watch rebuilds Markdown, keeps last good page on error, then recovers',asy
   fs.writeFileSync(markdown,'# Before\n\nFirst version');
   const free=net.createServer();await new Promise(resolve=>free.listen(0,'127.0.0.1',resolve));
   const port=free.address().port;await new Promise(resolve=>free.close(resolve));
-  const child=spawn(process.execPath,[cli,'serve',project,'--watch','--port',String(port)],{stdio:['ignore','pipe','pipe']});
+  const child=spawn(process.execPath,[cli,'serve',project,'--port',String(port)],{stdio:['ignore','pipe','pipe']});
   let diagnostics='';child.stdout.on('data',data=>diagnostics+=data);child.stderr.on('data',data=>diagnostics+=data);
   const base=`http://127.0.0.1:${port}`;
   try{

@@ -10,7 +10,7 @@ import { watchProject } from './watch.mjs';
 const require = createRequire(import.meta.url);
 const SKILL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [command, projectArg, ...args] = process.argv.slice(2);
-const help = `用法：node <skill>/scripts/slides.mjs init|build|serve <项目目录> [--port 8080] [--watch]\nserve --watch：保存 Markdown/素材后自动构建并刷新网页；输出：dist/`;
+const help = `用法：node <skill>/scripts/slides.mjs init|build|serve <项目目录> [--port 8080] [--no-watch]\nserve 默认在保存 Markdown/素材后自动构建并刷新网页；--no-watch 只预览已构建的 dist/`;
 function files(dir) {
   return fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => {
     const p = path.join(dir, e.name);
@@ -74,9 +74,10 @@ function build(project) {
   } finally { if (fs.existsSync(stage)) fs.rmSync(stage,{recursive:true}); }
 }
 function serve(project) {
-  let port=8080,watch=false;
+  let port=8080,watch=true;
   for(let i=0;i<args.length;i++){
     if(args[i]==='--watch')watch=true;
+    else if(args[i]==='--no-watch')watch=false;
     else if(args[i]==='--port' && args[i+1])port=Number(args[++i]);
     else throw new Error(help);
   }

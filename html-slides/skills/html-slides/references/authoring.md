@@ -69,7 +69,7 @@ HTML 是可信作者内容，不做安全沙箱。不要将来路不明的脚本
 
 这里只需要填写要改的操作；未写的操作沿用默认（除 next/prev 外都是空数组）。完全关闭快捷键用 `{"keyboard":false}`。按键名使用浏览器的 `KeyboardEvent.code`：方向键、Space、PageUp/PageDown、Home/End、Enter、KeyA–KeyZ。同一按键不可分配给多个操作。下方按钮始终可用。焦点在输入框、链接和媒体控件内时不抢按键。支持 `deck.html#slide-3` 定位页面。打印显示全部页面与 fragment，默认不打印讲稿；打印不等于原生 PPTX 导出。
 
-编辑时运行 `node <skill>/scripts/slides.mjs serve <project> --watch --port 8080`，在浏览器打开本地地址。保存 `slides/*.md`、assets、demos、`theme.css` 或配置后会重建并刷新，尽量停留在原页。编译失败时网页显示错误并保留上次可用版本。初次启动需有可成功构建的文稿；普通 `serve`、直接打开 HTML、已复制出去的 dist 不会监听源文件。
+编辑时运行 `node <skill>/scripts/slides.mjs serve <project> --port 8080`，在浏览器打开本地地址。保存 `slides/*.md`、assets、demos、`theme.css` 或配置后会重建并刷新，尽量停留在原页。编译失败时网页显示错误并保留上次可用版本。初次启动需有可成功构建的文稿；`serve --no-watch`、直接打开 HTML、已复制出去的 dist 不会监听源文件。
 
 ## 离线约定
 

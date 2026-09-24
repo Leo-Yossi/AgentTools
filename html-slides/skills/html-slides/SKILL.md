@@ -29,12 +29,11 @@ description: Discuss presentations page by page and compile Markdown into HTML s
 node "<skill>/scripts/slides.mjs" init "<project>"
 node "<skill>/scripts/slides.mjs" build "<project>"
 node "<skill>/scripts/slides.mjs" serve "<project>" --port 8080
-node "<skill>/scripts/slides.mjs" serve "<project>" --watch --port 8080
 ```
 
 已有项目跳过 init。init 只接受空目录，build 只替换自己生成的 dist。源码和资源不可写进 skill。完整复制项目 `dist/` 即可交付，双击 `dist/index.html` 进入目录，也可使用本地预览。仅拷贝单个 HTML 会丢失字体、样式和 Demo。
 
-制作或修改课件时推荐使用 `serve --watch`：Markdown、图片、Demo 或样式保存后自动重新构建，浏览器刷新并保留页码链接。首次启动需要已有可成功构建的文稿或上一次成功的 dist；构建失败会继续显示旧版并在网页中报错。只用 `build` 或双击 HTML 时不会自动更新。
+制作或修改课件时运行 `serve`：Markdown、图片、Demo 或样式保存后自动重新构建，浏览器刷新并保留页码链接。首次启动需要已有可成功构建的文稿或上一次成功的 dist；构建失败会继续显示旧版并在网页中报错。`serve --no-watch` 只预览已有 dist；只用 `build` 或双击 HTML 时不会自动更新。
 
 写 Markdown 前阅读 [写作规范](references/authoring.md)。排查编译、离线与布局问题时阅读 [验证说明](references/validation.md)。不要为每套课件复制或修改编译器；专属视觉调整放项目 `theme.css`。
 
