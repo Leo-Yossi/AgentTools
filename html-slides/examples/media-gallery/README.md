@@ -2,7 +2,7 @@
 
 9 页演示覆盖图片放大、GIF、视频、WebVTT 字幕、播放片段、音频、本地网页、远程网页的离线替代、PDF 和附件。
 
-从仓库根目录执行：
+从 AgentTools/html-slides 子项目目录执行：
 
 ```sh
 node skills/html-slides/scripts/slides.mjs build examples/media-gallery
