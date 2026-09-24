@@ -49,6 +49,8 @@ node skills/html-slides/scripts/slides.mjs serve ../../my-talk --port 8081
 
 目前直接支持图片放大、GIF、音视频、字幕、片段播放、嵌入网页、PDF 和附件。离开页面后音视频暂停，iframe 卸载。图表、3D 等通过独立本地 Demo 扩展，对应库没有内置。
 
+每页有保守的内容量上限。超限时构建会列出页码与标题，请精简文字、移入讲稿或拆页；页面不使用纵向滚动条。实际排版还需按目标投影尺寸检查，若浏览器右上角提示溢出，应继续修改 Markdown。
+
 - [Markdown 写作规范](skills/html-slides/references/authoring.md)
 - [多媒体支持范围、写法与官方资料](skills/html-slides/references/multimedia.md)
 - [验证与排错](skills/html-slides/references/validation.md)

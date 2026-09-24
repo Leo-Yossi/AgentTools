@@ -4,6 +4,7 @@
   const counts = slides.map(() => 0);
   let current = 0;
   let previous = -1;
+  const layoutWarning=document.createElement('div');layoutWarning.id='layout-warning';layoutWarning.hidden=true;layoutWarning.setAttribute('role','alert');document.body.append(layoutWarning);
   const mediaStatus=(media,text)=>{const status=media.closest('.media')?.querySelector('.media-status');if(status)status.textContent=text;};
   document.querySelectorAll('video,audio').forEach(media=>{
     const start=Number(media.dataset.start||0),end=Number(media.dataset.end||Infinity);
@@ -71,7 +72,10 @@
     // Useful for manual review and automated layout checks, without silently shrinking text.
     requestAnimationFrame(() => {
       const slide = slides[current];
-      slide.dataset.overflow = String(slide.scrollHeight > slide.clientHeight + 2 || slide.scrollWidth > slide.clientWidth + 2);
+      const overflowing=slide.scrollHeight > slide.clientHeight + 2 || slide.scrollWidth > slide.clientWidth + 2;
+      slide.dataset.overflow = String(overflowing);
+      layoutWarning.hidden=!overflowing;
+      layoutWarning.textContent=overflowing ? `第 ${current+1} 页内容超出画面，请精简或拆页` : '';
     });
   }
   function next() {

@@ -5,6 +5,7 @@ import { parseFragment, serializeOuter } from 'parse5';
 import katex from 'katex';
 import hljs from 'highlight.js';
 import { renderMedia } from './media.mjs';
+import { checkSlideDensity } from './layout.mjs';
 
 export const escape = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const attr = (n, key) => n.attrs?.find(a => a.name === key)?.value;
@@ -132,6 +133,7 @@ export function compile(source, options = {}) {
     }
   });
   const titles = pages.map((p, i) => textOf(p.find(n => /^h[1-3]$/.test(n.tagName)) || {value:`第 ${i + 1} 页`}));
+  checkSlideDensity(pages, titles);
   return {
     title: titles[0], titles, count: pages.length, media,
     body: `<div class="deck"><div class="slides">${pages.map((p,i) => `<section class="slide${i === 0 ? ' active' : ''}" id="slide-${i+1}" aria-label="${escape(titles[i])}">${htmlOf(p)}</section>`).join('\n')}</div></div>` +

@@ -27,6 +27,13 @@ test('math preserves TeX escapes and notes render Markdown',()=>{
   assert.match(r.body,/class="katex/); assert.match(r.body,/<strong>bold<\/strong>/);
   assert.throws(()=>compile('# X\n\n$$\nx'),/结束符/);
 });
+test('dense pages fail with page title and splitting restores a buildable deck',()=>{
+  const items=Array.from({length:10},(_,i)=>`- 第 ${i+1} 个长要点，包含需要解释的完整背景与附加细节`).join('\n');
+  assert.throws(()=>compile(`# 过长页\n\n${items}`),/第 1 页「过长页」内容量/);
+  const compact=compile(`# 上半部分\n\n${items.split('\n').slice(0,5).join('\n')}\n\n---\n\n# 下半部分\n\n${items.split('\n').slice(5).join('\n')}`);
+  assert.equal(compact.count,2);
+  assert.equal(compile('# 标题\n\n一句观点\n\n<aside class="speaker-notes">'+('背景说明'.repeat(400))+'</aside>').count,1);
+});
 test('build remains isolated, validates resources and preserves last successful output',()=>{
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'html-slides-test-'));
   const project=path.join(root,'中文 project');
@@ -43,6 +50,9 @@ test('build remains isolated, validates resources and preserves last successful 
     assert.equal(fs.readFileSync(output,'utf8'),before);
     fs.writeFileSync(path.join(project,'slides/deck.md'),'# Remote\n\n![x](https://example.com/image.png)');
     assert.notEqual(run('build',project).status,0);
+    fs.writeFileSync(path.join(project,'slides/deck.md'),'# Too dense\n\n'+Array.from({length:10},(_,i)=>`- Long detail ${i} with extra text to fill the slide`).join('\n'));
+    assert.notEqual(run('build',project).status,0);
+    assert.equal(fs.readFileSync(output,'utf8'),before);
     fs.writeFileSync(path.join(project,'slides/deck.md'),'# New');
     assert.equal(run('build',project).status,0);
     assert.notEqual(fs.readFileSync(output,'utf8'),before);

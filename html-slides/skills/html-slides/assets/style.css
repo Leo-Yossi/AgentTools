@@ -46,7 +46,7 @@ html, body {
   background: #fafafa;
 }
 .slide.active { display: flex; }
-.slide { overflow: auto; padding-bottom: 76px; }
+.slide { overflow: hidden; padding-bottom: 76px; }
 .slide > * { flex-shrink: 0; }
 .slide p { margin: .35em 0; }
 .slide ul, .slide ol { margin: .35em 0; }
@@ -77,6 +77,8 @@ html, body {
 .controls { position: fixed; bottom: 12px; right: 18px; display: flex; gap: 10px; align-items: center; z-index: 100; background: #fffffff0; padding: 4px 8px; border-radius: 8px; }
 .controls button { border: 1px solid #ddd; border-radius: 5px; background: white; padding: 5px 10px; cursor: pointer; }
 .controls #slide-counter { position: static; padding: 0; background: none; }
+#layout-warning { position: fixed; top: 12px; right: 18px; z-index: 200; max-width: 45vw; padding: 8px 12px; color: #8a1c1c; background: #fff0f0; border: 2px solid #c33; border-radius: 6px; font-size: 1rem; }
+#layout-warning[hidden] { display: none; }
 @media (max-width: 700px) {
   .slide { padding: 5vh 6vw 76px; }
   .slide h1 { font-size: 2rem; }
@@ -87,7 +89,7 @@ html, body {
   html, body, .deck, .slides { height: auto !important; overflow: visible !important; }
   .slide { display: block !important; position: relative !important; min-height: 100vh; height: auto; overflow: visible; break-after: page; padding: 32px; }
   .fragment { opacity: 1 !important; }
-  .controls, .speaker-notes, .preamble { display: none !important; }
+  .controls, .speaker-notes, .preamble, #layout-warning { display: none !important; }
 }
 
 .slide h1 {
@@ -115,8 +117,9 @@ html, body {
   border-radius: 8px;
   padding: 16px 18px;
   font-size: 1.1rem;
-  overflow: auto;
-  max-height: 60vh;
+  overflow: visible;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .slide code {
   font-family: 'Inconsolata', 'Fira Code', ui-monospace, monospace;
